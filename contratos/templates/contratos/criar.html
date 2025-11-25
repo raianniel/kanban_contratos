@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+
+{% block title %}Novo Contrato - Sistema de Contratos{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-file-earmark-plus"></i> Novo Contrato
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="formContrato" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Identificação -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-info-circle"></i> Identificação
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <label for="nome_negociacao" class="form-label">Nome da Negociação *</label>
+                                <input type="text" class="form-control" id="nome_negociacao" name="nome_negociacao" required
+                                       placeholder="Ex: Contrato Apt 101 - João Silva">
+                                <small class="text-muted">Nome descritivo para identificar o contrato</small>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Status Inicial</label>
+                                <select class="form-select" id="status" name="status">
+                                    {% for code, label in status_choices %}
+                                    <option value="{{ code }}" {% if code == 'VALIDACAO_DADOS' %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Dados do Locatário -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-person"></i> Dados do Locatário
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="locatario_nome" class="form-label">Nome do Locatário *</label>
+                                <input type="text" class="form-control" id="locatario_nome" name="locatario_nome" required
+                                       placeholder="Nome completo">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="locatario_tipo" class="form-label">Tipo *</label>
+                                <select class="form-select" id="locatario_tipo" name="locatario_tipo" required>
+                                    {% for code, label in tipo_locatario_choices %}
+                                    <option value="{{ code }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="locatario_documento" class="form-label">CPF/CNPJ *</label>
+                                <input type="text" class="form-control" id="locatario_documento" name="locatario_documento" required
+                                       placeholder="000.000.000-00">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="locatario_email" class="form-label">E-mail *</label>
+                                <input type="email" class="form-control" id="locatario_email" name="locatario_email" required
+                                       placeholder="email@exemplo.com">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="locatario_telefone" class="form-label">Telefone *</label>
+                                <input type="tel" class="form-control" id="locatario_telefone" name="locatario_telefone" required
+                                       placeholder="(00) 00000-0000">
+                            </div>
+                        </div>
+                        
+                        <!-- Dados do Imóvel -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-house"></i> Dados do Imóvel
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-9">
+                                <label for="imovel_endereco" class="form-label">Endereço do Imóvel *</label>
+                                <input type="text" class="form-control" id="imovel_endereco" name="imovel_endereco" required
+                                       placeholder="Rua, número, bairro, cidade">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="imovel_codigo" class="form-label">Código</label>
+                                <input type="text" class="form-control" id="imovel_codigo" name="imovel_codigo"
+                                       placeholder="APT-101">
+                            </div>
+                        </div>
+                        
+                        <!-- Vigência e Valores -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-calendar"></i> Vigência e Valores
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="inicio_vigencia" class="form-label">Início da Vigência *</label>
+                                <input type="date" class="form-control" id="inicio_vigencia" name="inicio_vigencia" required>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="fim_vigencia" class="form-label">Fim da Vigência *</label>
+                                <input type="date" class="form-control" id="fim_vigencia" name="fim_vigencia" required>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="valor_aluguel" class="form-label">Valor do Aluguel *</label>
+                                <input type="text" class="form-control" id="valor_aluguel" name="valor_aluguel" 
+                                       required placeholder="Ex: 1500.00" pattern="[0-9]+(\.[0-9]{1,2})?"
+                                       title="Use ponto para decimais (ex: 1500.00)">
+                                <small class="form-text text-muted">Use ponto para decimais (ex: 1500.00)</small>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="tipo_garantia" class="form-label">Tipo de Garantia</label>
+                                <select class="form-select" id="tipo_garantia" name="tipo_garantia">
+                                    {% for code, label in tipo_garantia_choices %}
+                                    <option value="{{ code }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Controle -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-gear"></i> Controle
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="prazo_fase_dias" class="form-label">Prazo da Fase (dias)</label>
+                                <input type="number" class="form-control" id="prazo_fase_dias" name="prazo_fase_dias" 
+                                       value="5" min="1" max="365">
+                                <small class="text-muted">SLA para conclusão da fase</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Documentos e Anexos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-paperclip"></i> Documentos e Anexos
+                                </h5>
+                            </div>
+                            
+                            <div class="col-12">
+                                <!-- Aviso de documentos faltantes -->
+                                <div id="aviso-faltantes" class="alert alert-danger" style="display: none;">
+                                    <h6><i class="bi bi-exclamation-triangle"></i> <strong>Documentos Faltantes</strong></h6>
+                                    <p class="mb-2">Os seguintes documentos ainda não foram anexados:</p>
+                                    <ul id="lista-faltantes" class="mb-0"></ul>
+                                </div>
+                                
+                                <!-- Lista de documentos necessários (muda conforme tipo de locatário) -->
+                                <div id="docs-pf" class="alert alert-info" style="display: none;">
+                                    <h6><strong>PESSOA FÍSICA: LOCATÁRIO E FIADOR (E CÔNJUGE SE CASADO)</strong></h6>
+                                    <ol class="mb-0" id="lista-docs-pf">
+                                        {% for doc in documentos_pf %}
+                                        <li data-doc="{{ doc }}">{{ doc }}</li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                                
+                                <div id="docs-pj" class="alert alert-warning" style="display: none;">
+                                    <h6><strong>PESSOA JURÍDICA: EMPRESA</strong></h6>
+                                    <ol class="mb-0" id="lista-docs-pj">
+                                        {% for doc in documentos_pj %}
+                                        <li data-doc="{{ doc }}">{{ doc }}</li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                                
+                                <!-- Área de upload de múltiplos arquivos -->
+                                <div class="card mt-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Anexar Documentos</h6>
+                                        <p class="text-muted small">Selecione o tipo de documento e anexe o arquivo correspondente</p>
+                                        
+                                        <div id="anexos-container">
+                                            <!-- Primeiro campo de anexo -->
+                                            <div class="row mb-3 anexo-item">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Tipo de Documento *</label>
+                                                    <select class="form-select tipo-doc-select" name="descricoes_anexos" onchange="verificarFaltantes()">
+                                                        <option value="">Selecione o tipo...</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Arquivo *</label>
+                                                    <input type="file" class="form-control" name="anexos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="verificarFaltantes()">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Observação</label>
+                                                    <input type="text" class="form-control" placeholder="Opcional">
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="removerAnexo(this)" style="display: none;">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarAnexo()">
+                                            <i class="bi bi-plus-circle"></i> Adicionar Mais Arquivos
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Observações Gerais -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header" style="background-color: var(--t2-cinza-escuro); color: var(--t2-branco);">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-chat-left-text"></i> Observações Gerais
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="observacoes_gerais" class="form-label">Observações</label>
+                                            <textarea class="form-control" id="observacoes_gerais" name="observacoes_gerais" rows="4" 
+                                                      placeholder="Digite aqui observações gerais sobre o contrato, informações adicionais, pendências, etc."></textarea>
+                                            <small class="text-muted">Campo opcional para anotações e informações complementares</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr>
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-check-circle"></i> Criar Contrato
+                                </button>
+                                <a href="{% url 'contratos:kanban' %}" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Listas de documentos por tipo
+const documentosPF = [
+    {% for doc in documentos_pf %}"{{ doc }}"{% if not forloop.last %},{% endif %}{% endfor %}
+];
+const documentosPJ = [
+    {% for doc in documentos_pj %}"{{ doc }}"{% if not forloop.last %},{% endif %}{% endfor %}
+];
+
+// Definir data mínima para fim da vigência baseado no início
+document.getElementById('inicio_vigencia').addEventListener('change', function() {
+    document.getElementById('fim_vigencia').min = this.value;
+});
+
+// Máscara simples para CPF/CNPJ e mostrar documentos necessários
+document.getElementById('locatario_tipo').addEventListener('change', function() {
+    const docInput = document.getElementById('locatario_documento');
+    const docsPF = document.getElementById('docs-pf');
+    const docsPJ = document.getElementById('docs-pj');
+    
+    if (this.value === 'PF') {
+        docInput.placeholder = '000.000.000-00';
+        docInput.maxLength = 14;
+        docsPF.style.display = 'block';
+        docsPJ.style.display = 'none';
+    } else {
+        docInput.placeholder = '00.000.000/0000-00';
+        docInput.maxLength = 18;
+        docsPF.style.display = 'none';
+        docsPJ.style.display = 'block';
+    }
+    
+    // Atualizar dropdowns de tipo de documento
+    atualizarDropdownsDocumentos();
+    verificarFaltantes();
+});
+
+// Mostrar documentos ao carregar se já tiver tipo selecionado
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('locatario_tipo');
+    if (tipoSelect.value) {
+        tipoSelect.dispatchEvent(new Event('change'));
+    }
+});
+
+// Atualizar todos os dropdowns de tipo de documento
+function atualizarDropdownsDocumentos() {
+    const tipoLocatario = document.getElementById('locatario_tipo').value;
+    const documentos = tipoLocatario === 'PF' ? documentosPF : documentosPJ;
+    
+    const selects = document.querySelectorAll('.tipo-doc-select');
+    selects.forEach(select => {
+        const valorAtual = select.value;
+        select.innerHTML = '<option value="">Selecione o tipo...</option>';
+        
+        documentos.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc;
+            option.textContent = doc;
+            if (doc === valorAtual) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    });
+}
+
+// Adicionar novo campo de anexo
+function adicionarAnexo() {
+    const container = document.getElementById('anexos-container');
+    const novoAnexo = document.createElement('div');
+    novoAnexo.className = 'row mb-3 anexo-item';
+    novoAnexo.innerHTML = `
+        <div class="col-md-4">
+            <label class="form-label">Tipo de Documento *</label>
+            <select class="form-select tipo-doc-select" name="descricoes_anexos" onchange="verificarFaltantes()">
+                <option value="">Selecione o tipo...</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Arquivo *</label>
+            <input type="file" class="form-control" name="anexos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="verificarFaltantes()">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Observação</label>
+            <input type="text" class="form-control" placeholder="Opcional">
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removerAnexo(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(novoAnexo);
+    
+    // Atualizar dropdown do novo item
+    atualizarDropdownsDocumentos();
+    
+    // Mostrar botão de remover no primeiro item se houver mais de um
+    atualizarBotoesRemover();
+}
+
+// Remover campo de anexo
+function removerAnexo(botao) {
+    const item = botao.closest('.anexo-item');
+    item.remove();
+    atualizarBotoesRemover();
+    verificarFaltantes();
+}
+
+// Atualizar visibilidade dos botões de remover
+function atualizarBotoesRemover() {
+    const items = document.querySelectorAll('.anexo-item');
+    items.forEach((item, index) => {
+        const botao = item.querySelector('.btn-danger');
+        if (items.length > 1) {
+            botao.style.display = 'block';
+        } else {
+            botao.style.display = 'none';
+        }
+    });
+}
+
+// Verificar documentos faltantes
+function verificarFaltantes() {
+    const tipoLocatario = document.getElementById('locatario_tipo').value;
+    if (!tipoLocatario) return;
+    
+    const documentosNecessarios = tipoLocatario === 'PF' ? documentosPF : documentosPJ;
+    
+    // Obter documentos já anexados
+    const documentosAnexados = [];
+    const selects = document.querySelectorAll('.tipo-doc-select');
+    const arquivos = document.querySelectorAll('input[type="file"][name="anexos"]');
+    
+    selects.forEach((select, index) => {
+        if (select.value && arquivos[index] && arquivos[index].files.length > 0) {
+            documentosAnexados.push(select.value);
+        }
+    });
+    
+    // Calcular faltantes
+    const faltantes = documentosNecessarios.filter(doc => !documentosAnexados.includes(doc));
+    
+    // Atualizar aviso
+    const avisoDiv = document.getElementById('aviso-faltantes');
+    const listaUl = document.getElementById('lista-faltantes');
+    
+    if (faltantes.length > 0) {
+        listaUl.innerHTML = '';
+        faltantes.forEach(doc => {
+            const li = document.createElement('li');
+            li.textContent = doc;
+            listaUl.appendChild(li);
+        });
+        avisoDiv.style.display = 'block';
+        
+        // Marcar itens faltantes na lista principal
+        const listaDocs = tipoLocatario === 'PF' ? 
+            document.querySelectorAll('#lista-docs-pf li') : 
+            document.querySelectorAll('#lista-docs-pj li');
+        
+        listaDocs.forEach(li => {
+            const doc = li.getAttribute('data-doc');
+            if (faltantes.includes(doc)) {
+                li.style.color = 'red';
+                li.style.fontWeight = 'bold';
+            } else {
+                li.style.color = 'green';
+                li.style.fontWeight = 'normal';
+                li.innerHTML = '<s>' + doc + '</s> ✓';
+            }
+        });
+    } else {
+        avisoDiv.style.display = 'none';
+        
+        // Marcar todos como completos
+        const listaDocs = tipoLocatario === 'PF' ? 
+            document.querySelectorAll('#lista-docs-pf li') : 
+            document.querySelectorAll('#lista-docs-pj li');
+        
+        listaDocs.forEach(li => {
+            const doc = li.getAttribute('data-doc');
+            li.style.color = 'green';
+            li.style.fontWeight = 'normal';
+            li.innerHTML = '<s>' + doc + '</s> ✓';
+        });
+    }
+}
+</script>
+{% endblock %}

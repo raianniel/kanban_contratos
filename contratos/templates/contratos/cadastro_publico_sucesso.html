@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Realizado - T2 Web</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- T2 Theme CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/t2_theme.css' %}">
+    
+    <style>
+        body {
+            background-color: var(--t2-cinza-muito-claro);
+        }
+        
+        .sucesso-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+        }
+        
+        .sucesso-card {
+            background-color: var(--t2-branco);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sucesso-icon {
+            font-size: 80px;
+            color: var(--t2-verde);
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background-color: var(--t2-cinza-muito-claro);
+            border-left: 4px solid var(--t2-azul);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="sucesso-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="sucesso-card">
+                        <div class="card-body p-5 text-center">
+                            <i class="bi bi-check-circle-fill sucesso-icon"></i>
+                            
+                            <h2 class="mb-3">Cadastro Realizado com Sucesso!</h2>
+                            
+                            <p class="lead text-muted mb-4">
+                                Seu contrato foi registrado e está em análise pela nossa equipe.
+                            </p>
+                            
+                            <div class="info-box text-start">
+                                <h5 class="mb-3">
+                                    <i class="bi bi-info-circle"></i> Informações do Cadastro
+                                </h5>
+                                
+                                <p class="mb-2">
+                                    <strong>Nome:</strong> {{ contrato.locatario_nome }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>E-mail:</strong> {{ contrato.locatario_email }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Telefone:</strong> {{ contrato.locatario_telefone }}
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Imóvel:</strong> {{ contrato.imovel_endereco }}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Status:</strong> 
+                                    <span class="badge bg-primary">Validação de Dados</span>
+                                </p>
+                            </div>
+                            
+                            <div class="alert alert-info mt-4" role="alert">
+                                <strong>Próximos Passos:</strong>
+                                <p class="mb-0 mt-2">
+                                    Você receberá um e-mail em <strong>{{ contrato.locatario_email }}</strong> 
+                                    com instruções sobre os documentos necessários e o andamento do processo.
+                                </p>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <a href="{% url 'contratos:cadastro_publico' %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-arrow-left"></i> Fazer Outro Cadastro
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            <small>
+                                <i class="bi bi-telephone"></i> Dúvidas? Entre em contato conosco<br>
+                                © 2025 T2 Web Real Estate. Todos os direitos reservados.
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

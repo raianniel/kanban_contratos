@@ -1,0 +1,424 @@
+/**
+ * T2 Real Estate - Tema Customizado
+ * Paleta de Cores Oficial
+ */
+
+:root {
+    /* Cores Principais */
+    --t2-preto: #000000;
+    --t2-branco: #FFFFFF;
+    
+    /* Cores Secundárias */
+    --t2-azul: #5B7FDB;
+    --t2-verde: #5EADA5;
+    --t2-amarelo: #F5B85F;
+    --t2-laranja: #F58B5F;
+    
+    /* Tons de Cinza */
+    --t2-cinza-escuro: #404040;
+    --t2-cinza-medio: #808080;
+    --t2-cinza-claro: #BFBFBF;
+    --t2-cinza-muito-claro: #F5F5F5;
+    
+    /* Variações para UI */
+    --t2-azul-claro: #8FA8E8;
+    --t2-verde-claro: #8FC9C3;
+    --t2-amarelo-claro: #F9D19F;
+    --t2-laranja-claro: #F9B89F;
+}
+
+/* ========== RESET E BASE ========== */
+body {
+    background-color: var(--t2-cinza-muito-claro);
+    color: var(--t2-preto);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ========== NAVBAR ========== */
+.navbar {
+    background-color: var(--t2-preto) !important;
+    border-bottom: 3px solid var(--t2-azul);
+}
+
+.navbar-brand {
+    color: var(--t2-branco) !important;
+    font-weight: 600;
+}
+
+.navbar-nav .nav-link {
+    color: var(--t2-branco) !important;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--t2-azul-claro) !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: var(--t2-azul) !important;
+    border-bottom: 2px solid var(--t2-azul);
+}
+
+/* Botão Sair */
+.btn-outline-light {
+    border-color: var(--t2-branco);
+    color: var(--t2-branco);
+}
+
+.btn-outline-light:hover {
+    background-color: var(--t2-branco);
+    color: var(--t2-preto);
+}
+
+/* ========== CARDS ========== */
+.card {
+    border: 1px solid var(--t2-cinza-claro);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: var(--t2-preto);
+    color: var(--t2-branco);
+    font-weight: 600;
+    border-bottom: 2px solid var(--t2-azul);
+}
+
+/* ========== BOTÕES ========== */
+.btn-primary {
+    background-color: var(--t2-azul);
+    border-color: var(--t2-azul);
+    color: var(--t2-branco);
+}
+
+.btn-primary:hover {
+    background-color: #4A6BC2;
+    border-color: #4A6BC2;
+}
+
+.btn-success {
+    background-color: var(--t2-verde);
+    border-color: var(--t2-verde);
+    color: var(--t2-branco);
+}
+
+.btn-success:hover {
+    background-color: #4D9B94;
+    border-color: #4D9B94;
+}
+
+.btn-warning {
+    background-color: var(--t2-amarelo);
+    border-color: var(--t2-amarelo);
+    color: var(--t2-preto);
+}
+
+.btn-warning:hover {
+    background-color: #E5A74E;
+    border-color: #E5A74E);
+}
+
+.btn-danger {
+    background-color: var(--t2-laranja);
+    border-color: var(--t2-laranja);
+    color: var(--t2-branco);
+}
+
+.btn-danger:hover {
+    background-color: #E57A4E;
+    border-color: #E57A4E;
+}
+
+.btn-secondary {
+    background-color: var(--t2-cinza-medio);
+    border-color: var(--t2-cinza-medio);
+    color: var(--t2-branco);
+}
+
+.btn-secondary:hover {
+    background-color: var(--t2-cinza-escuro);
+    border-color: var(--t2-cinza-escuro);
+}
+
+.btn-dark {
+    background-color: var(--t2-preto);
+    border-color: var(--t2-preto);
+    color: var(--t2-branco);
+}
+
+.btn-dark:hover {
+    background-color: var(--t2-cinza-escuro);
+    border-color: var(--t2-cinza-escuro);
+}
+
+/* ========== BADGES ========== */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.8em;
+}
+
+.badge.bg-primary {
+    background-color: var(--t2-azul) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--t2-verde) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--t2-amarelo) !important;
+    color: var(--t2-preto) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--t2-laranja) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--t2-azul-claro) !important;
+}
+
+.badge.bg-dark {
+    background-color: var(--t2-preto) !important;
+}
+
+/* ========== KANBAN ========== */
+.kanban-column {
+    background-color: var(--t2-cinza-muito-claro);
+    border: 1px solid var(--t2-cinza-claro);
+    border-radius: 8px;
+    padding: 15px;
+    min-height: 500px;
+}
+
+.kanban-column h5 {
+    color: var(--t2-preto);
+    font-weight: 600;
+    border-bottom: 2px solid var(--t2-azul);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.kanban-card {
+    background-color: var(--t2-branco);
+    border: 1px solid var(--t2-cinza-claro);
+    border-left: 4px solid var(--t2-azul);
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.kanban-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.kanban-card .card-title {
+    color: var(--t2-preto);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.kanban-card .card-text {
+    color: var(--t2-cinza-escuro);
+    font-size: 0.9rem;
+}
+
+/* ========== FORMULÁRIOS ========== */
+.form-label {
+    color: var(--t2-preto);
+    font-weight: 500;
+}
+
+.form-control {
+    border: 1px solid var(--t2-cinza-claro);
+    border-radius: 4px;
+}
+
+.form-control:focus {
+    border-color: var(--t2-azul);
+    box-shadow: 0 0 0 0.2rem rgba(91, 127, 219, 0.25);
+}
+
+.form-select {
+    border: 1px solid var(--t2-cinza-claro);
+}
+
+.form-select:focus {
+    border-color: var(--t2-azul);
+    box-shadow: 0 0 0 0.2rem rgba(91, 127, 219, 0.25);
+}
+
+/* ========== TABELAS ========== */
+.table {
+    background-color: var(--t2-branco);
+}
+
+.table thead th {
+    background-color: var(--t2-preto);
+    color: var(--t2-branco);
+    border-bottom: 2px solid var(--t2-azul);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--t2-cinza-muito-claro);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--t2-azul-claro);
+    color: var(--t2-preto);
+}
+
+/* ========== ALERTAS ========== */
+.alert-success {
+    background-color: var(--t2-verde-claro);
+    border-color: var(--t2-verde);
+    color: var(--t2-preto);
+}
+
+.alert-warning {
+    background-color: var(--t2-amarelo-claro);
+    border-color: var(--t2-amarelo);
+    color: var(--t2-preto);
+}
+
+.alert-danger {
+    background-color: var(--t2-laranja-claro);
+    border-color: var(--t2-laranja);
+    color: var(--t2-preto);
+}
+
+.alert-info {
+    background-color: var(--t2-azul-claro);
+    border-color: var(--t2-azul);
+    color: var(--t2-preto);
+}
+
+/* ========== LOGIN ========== */
+.login-container {
+    background-color: var(--t2-preto);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background-color: var(--t2-branco);
+    border: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+}
+
+.login-header {
+    background-color: var(--t2-preto);
+    color: var(--t2-branco);
+    border-bottom: 3px solid var(--t2-azul);
+    border-radius: 12px 12px 0 0;
+    padding: 30px;
+    text-align: center;
+}
+
+.login-logo {
+    max-width: 200px;
+    margin-bottom: 20px;
+}
+
+/* ========== DASHBOARD ========== */
+.dashboard-card {
+    border-left: 4px solid var(--t2-azul);
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    border-left-color: var(--t2-verde);
+    transform: translateY(-5px);
+}
+
+.dashboard-stat {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--t2-azul);
+}
+
+/* ========== PROGRESS BARS ========== */
+.progress {
+    background-color: var(--t2-cinza-claro);
+}
+
+.progress-bar {
+    background-color: var(--t2-azul);
+}
+
+.progress-bar.bg-success {
+    background-color: var(--t2-verde) !important;
+}
+
+.progress-bar.bg-warning {
+    background-color: var(--t2-amarelo) !important;
+}
+
+.progress-bar.bg-danger {
+    background-color: var(--t2-laranja) !important;
+}
+
+/* ========== MODAL ========== */
+.modal-header {
+    background-color: var(--t2-preto);
+    color: var(--t2-branco);
+    border-bottom: 2px solid var(--t2-azul);
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--t2-cinza-claro);
+}
+
+/* ========== LINKS ========== */
+a {
+    color: var(--t2-azul);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--t2-azul-claro);
+    text-decoration: underline;
+}
+
+/* ========== FOOTER ========== */
+.footer {
+    background-color: var(--t2-preto);
+    color: var(--t2-branco);
+    border-top: 3px solid var(--t2-azul);
+    padding: 20px 0;
+    margin-top: 50px;
+}
+
+.footer a {
+    color: var(--t2-azul-claro);
+}
+
+.footer a:hover {
+    color: var(--t2-branco);
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+    .kanban-column {
+        margin-bottom: 20px;
+    }
+    
+    .dashboard-stat {
+        font-size: 2rem;
+    }
+}

@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Contratos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="bi bi-graph-up"></i> Dashboard
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-file-text"></i> Total de Contratos
+                    </h5>
+                    <h2 class="mb-0">{{ total_contratos }}</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-exclamation-triangle"></i> Contratos Atrasados
+                    </h5>
+                    <h2 class="mb-0">{{ total_atrasados }}</h2>
+                    <small>SLA excedido</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-check-circle"></i> Taxa de Sucesso
+                    </h5>
+                    <h2 class="mb-0">
+                        {% if total_contratos > 0 %}
+                            {{ total_contratos|add:"-"|add:total_atrasados|floatformat:0|default:"0" }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h2>
+                    <small>Dentro do prazo</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contratos por Status -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart"></i> Contratos por Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if stats_status %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th class="text-end">Quantidade</th>
+                                    <th class="text-end">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in stats_status %}
+                                <tr>
+                                    <td>
+                                        {% for choice in stats_status %}
+                                            {% if choice.status == stat.status %}
+                                                {{ stat.status }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td class="text-end">{{ stat.total }}</td>
+                                    <td class="text-end">
+                                        {% widthratio stat.total total_contratos 100 %}%
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Nenhum dado disponível.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contratos por Responsável -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people"></i> Top 10 Responsáveis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if stats_responsavel %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Responsável</th>
+                                    <th class="text-end">Contratos</th>
+                                    <th class="text-end">%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in stats_responsavel %}
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-person-badge"></i>
+                                        {% if stat.responsavel__username %}
+                                            {{ stat.responsavel__username }}
+                                        {% else %}
+                                            <span class="text-muted">Não atribuído</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ stat.total }}</td>
+                                    <td class="text-end">
+                                        {% widthratio stat.total total_contratos 100 %}%
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">Nenhum dado disponível.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contratos com SLA Excedido -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Contratos com SLA Excedido
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if contratos_atrasados %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Contrato</th>
+                                    <th>Status</th>
+                                    <th>Responsável</th>
+                                    <th class="text-end">Dias na Fase</th>
+                                    <th class="text-end">Dias Excedidos</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in contratos_atrasados %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.contrato.nome_negociacao }}</strong><br>
+                                        <small class="text-muted">{{ item.contrato.locatario_nome }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background-color: {{ item.contrato.cor_coluna_status }};">
+                                            {{ item.contrato.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if item.contrato.responsavel %}
+                                            {{ item.contrato.responsavel.username }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ item.contrato.dias_na_fase_atual }}</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-danger">
+                                            +{{ item.dias_excedidos }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'contratos:detalhe' item.contrato.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle"></i> Nenhum contrato com SLA excedido. Parabéns!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

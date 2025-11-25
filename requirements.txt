@@ -1,0 +1,11 @@
+# Dependências principais (SQLite já vem com Python)
+Django==5.2.7
+Pillow==11.0.0
+
+# Opcional: Descomente se quiser usar MySQL ao invés de SQLite
+# mysqlclient==2.2.6
+
+
+# Para gerar PDFs de teste
+reportlab>=4.0.0
+

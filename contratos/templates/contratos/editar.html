@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Contrato - Sistema de Contratos{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square"></i> Editar Contrato
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="formContrato" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Identificação -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-info-circle"></i> Identificação
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <label for="nome_negociacao" class="form-label">Nome da Negociação *</label>
+                                <input type="text" class="form-control" id="nome_negociacao" name="nome_negociacao" required
+                                       value="{{ contrato.nome_negociacao }}">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    {% for code, label in status_choices %}
+                                    <option value="{{ code }}" {% if code == contrato.status %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Dados do Locatário -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-person"></i> Dados do Locatário
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="locatario_nome" class="form-label">Nome do Locatário *</label>
+                                <input type="text" class="form-control" id="locatario_nome" name="locatario_nome" required
+                                       value="{{ contrato.locatario_nome }}">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="locatario_tipo" class="form-label">Tipo *</label>
+                                <select class="form-select" id="locatario_tipo" name="locatario_tipo" required>
+                                    {% for code, label in tipo_locatario_choices %}
+                                    <option value="{{ code }}" {% if code == contrato.locatario_tipo %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="locatario_documento" class="form-label">CPF/CNPJ *</label>
+                                <input type="text" class="form-control" id="locatario_documento" name="locatario_documento" required
+                                       value="{{ contrato.locatario_documento }}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="locatario_email" class="form-label">E-mail *</label>
+                                <input type="email" class="form-control" id="locatario_email" name="locatario_email" required
+                                       value="{{ contrato.locatario_email }}" placeholder="email@exemplo.com">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="locatario_telefone" class="form-label">Telefone *</label>
+                                <input type="tel" class="form-control" id="locatario_telefone" name="locatario_telefone" required
+                                       value="{{ contrato.locatario_telefone }}" placeholder="(00) 00000-0000">
+                            </div>
+                        </div>
+                        
+                        <!-- Dados do Imóvel -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-house"></i> Dados do Imóvel
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-9">
+                                <label for="imovel_endereco" class="form-label">Endereço do Imóvel *</label>
+                                <input type="text" class="form-control" id="imovel_endereco" name="imovel_endereco" required
+                                       value="{{ contrato.imovel_endereco }}">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="imovel_codigo" class="form-label">Código</label>
+                                <input type="text" class="form-control" id="imovel_codigo" name="imovel_codigo"
+                                       value="{{ contrato.imovel_codigo }}">
+                            </div>
+                        </div>
+                        
+                        <!-- Vigência e Valores -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-calendar"></i> Vigência e Valores
+                                </h5>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="inicio_vigencia" class="form-label">Início da Vigência *</label>
+                                <input type="date" class="form-control" id="inicio_vigencia" name="inicio_vigencia" required
+                                       value="{{ contrato.inicio_vigencia|date:'Y-m-d' }}">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="fim_vigencia" class="form-label">Fim da Vigência *</label>
+                                <input type="date" class="form-control" id="fim_vigencia" name="fim_vigencia" required
+                                       value="{{ contrato.fim_vigencia|date:'Y-m-d' }}">
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="valor_aluguel" class="form-label">Valor do Aluguel *</label>
+                                <input type="text" class="form-control" id="valor_aluguel" name="valor_aluguel" 
+                                       placeholder="Ex: 1500.00" required 
+                                       value="{% if contrato.valor_aluguel %}{% load l10n %}{% localize off %}{{ contrato.valor_aluguel }}{% endlocalize %}{% endif %}">
+                                <small class="form-text text-muted">Use ponto para decimais (ex: 1500.00)</small>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label for="tipo_garantia" class="form-label">Tipo de Garantia</label>
+                                <select class="form-select" id="tipo_garantia" name="tipo_garantia">
+                                    {% for code, label in tipo_garantia_choices %}
+                                    <option value="{{ code }}" {% if code == contrato.tipo_garantia %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Controle -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-gear"></i> Controle
+                                </h5>
+                            </div>
+                            
+                            {% if user.is_staff %}
+                            <div class="col-md-4">
+                                <label for="responsavel" class="form-label">Responsável</label>
+                                <select class="form-select" id="responsavel" name="responsavel">
+                                    {% for resp in responsaveis %}
+                                    <option value="{{ resp.id }}" {% if resp.id == contrato.responsavel.id %}selected{% endif %}>
+                                        {{ resp.get_full_name|default:resp.username }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted">Apenas administradores podem alterar</small>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="col-md-4">
+                                <label for="prazo_fase_dias" class="form-label">Prazo da Fase (dias)</label>
+                                <input type="number" class="form-control" id="prazo_fase_dias" name="prazo_fase_dias" 
+                                       value="{{ contrato.prazo_fase_dias|default:'5' }}" min="1" max="365">
+                            </div>
+                        </div>
+                        
+                        <!-- Gerenciar Anexos -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="bi bi-paperclip"></i> Gerenciar Anexos
+                                </h5>
+                            </div>
+                            
+                            <div class="col-12">
+                                <!-- Anexos Existentes -->
+                                {% if contrato.anexos.all %}
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="bi bi-file-earmark-check"></i> Anexos Atuais</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Descrição</th>
+                                                        <th>Arquivo</th>
+                                                        <th>Enviado</th>
+                                                        <th width="80">Remover</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for anexo in contrato.anexos.all %}
+                                                    <tr>
+                                                        <td>
+                                                            <i class="bi bi-file-earmark"></i> 
+                                                            <strong>{{ anexo.descricao }}</strong>
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ anexo.arquivo.url }}" target="_blank" class="text-primary">
+                                                                <i class="bi bi-download"></i> Baixar
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">
+                                                                {{ anexo.enviado_em|date:"d/m/Y H:i" }}<br>
+                                                                por {{ anexo.enviado_por.username }}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" 
+                                                                       name="remover_anexos" value="{{ anexo.id }}"
+                                                                       id="remover_{{ anexo.id }}">
+                                                                <label class="form-check-label text-danger" for="remover_{{ anexo.id }}">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-info-circle"></i> Marque os anexos que deseja remover e clique em "Salvar Alterações"
+                                        </small>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-secondary mb-3">
+                                    <i class="bi bi-info-circle"></i> Nenhum anexo encontrado.
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Adicionar Novos Anexos -->
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0"><i class="bi bi-plus-circle"></i> Adicionar Novos Anexos</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="anexos-container-edit">
+                                            <!-- Primeiro campo de anexo -->
+                                            <div class="row mb-3 anexo-item-edit">
+                                                <div class="col-md-5">
+                                                    <label class="form-label">Tipo de Documento</label>
+                                                    <select class="form-select tipo-doc-select-edit" name="descricoes_anexos">
+                                                        <option value="">Selecione o tipo...</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <label class="form-label">Arquivo</label>
+                                                    <input type="file" class="form-control" name="anexos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                                </div>
+                                                <div class="col-md-2 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-danger btn-sm w-100" onclick="removerAnexoEdit(this)" style="display: none;">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarAnexoEdit()">
+                                            <i class="bi bi-plus-circle"></i> Adicionar Mais Arquivos
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr>
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="bi bi-check-circle"></i> Salvar Alterações
+                                </button>
+                                <a href="{% url 'contratos:detalhe' contrato.id %}" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Listas de documentos por tipo
+const documentosPF = [
+    {% for doc in documentos_pf %}"{{ doc }}"{% if not forloop.last %},{% endif %}{% endfor %}
+];
+const documentosPJ = [
+    {% for doc in documentos_pj %}"{{ doc }}"{% if not forloop.last %},{% endif %}{% endfor %}
+];
+
+// Definir data mínima para fim da vigência baseado no início
+document.getElementById('inicio_vigencia').addEventListener('change', function() {
+    document.getElementById('fim_vigencia').min = this.value;
+});
+
+// Atualizar dropdowns ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    atualizarDropdownsEdit();
+});
+
+// Atualizar dropdowns de documentos
+function atualizarDropdownsEdit() {
+    const tipoLocatario = document.getElementById('locatario_tipo').value;
+    const documentos = tipoLocatario === 'PF' ? documentosPF : documentosPJ;
+    
+    const selects = document.querySelectorAll('.tipo-doc-select-edit');
+    selects.forEach(select => {
+        const valorAtual = select.value;
+        select.innerHTML = '<option value="">Selecione o tipo...</option>';
+        
+        documentos.forEach(doc => {
+            const option = document.createElement('option');
+            option.value = doc;
+            option.textContent = doc;
+            if (doc === valorAtual) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    });
+}
+
+// Adicionar novo campo de anexo
+function adicionarAnexoEdit() {
+    const container = document.getElementById('anexos-container-edit');
+    const novoAnexo = document.createElement('div');
+    novoAnexo.className = 'row mb-3 anexo-item-edit';
+    novoAnexo.innerHTML = `
+        <div class="col-md-5">
+            <label class="form-label">Tipo de Documento</label>
+            <select class="form-select tipo-doc-select-edit" name="descricoes_anexos">
+                <option value="">Selecione o tipo...</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label">Arquivo</label>
+            <input type="file" class="form-control" name="anexos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removerAnexoEdit(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(novoAnexo);
+    
+    // Atualizar dropdown do novo item
+    atualizarDropdownsEdit();
+    
+    // Mostrar botão de remover
+    atualizarBotoesRemoverEdit();
+}
+
+// Remover campo de anexo
+function removerAnexoEdit(botao) {
+    const item = botao.closest('.anexo-item-edit');
+    item.remove();
+    atualizarBotoesRemoverEdit();
+}
+
+// Atualizar visibilidade dos botões de remover
+function atualizarBotoesRemoverEdit() {
+    const items = document.querySelectorAll('.anexo-item-edit');
+    items.forEach((item, index) => {
+        const botao = item.querySelector('.btn-danger');
+        if (items.length > 1) {
+            botao.style.display = 'block';
+        } else {
+            botao.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

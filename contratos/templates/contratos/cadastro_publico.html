@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Contrato - T2 Web</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- T2 Theme CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/t2_theme.css' %}">
+    
+    <style>
+        body {
+            background-color: var(--t2-cinza-muito-claro);
+        }
+        
+        .cadastro-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px 0;
+        }
+        
+        .cadastro-card {
+            background-color: var(--t2-branco);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cadastro-header {
+            background-color: var(--t2-preto);
+            color: var(--t2-branco);
+            border-radius: 12px 12px 0 0;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .cadastro-logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: var(--t2-azul);
+            font-weight: 600;
+            border-bottom: 2px solid var(--t2-azul);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cadastro-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <div class="cadastro-card">
+                        <div class="cadastro-header">
+                            <img src="{% static 'img/logo.png' %}" alt="T2 Web" class="cadastro-logo">
+                            <h2>Cadastro de Contrato de Locação</h2>
+                            <p class="mb-0">Preencha os dados abaixo para iniciar o processo</p>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            {% if messages %}
+                                {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <form method="post" enctype="multipart/form-data" id="formCadastroPublico">
+                                {% csrf_token %}
+                                
+                                <!-- Dados do Locatário -->
+                                <div class="mb-4">
+                                    <h5 class="section-title">
+                                        <i class="bi bi-person-fill"></i> Seus Dados
+                                    </h5>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="locatario_nome" class="form-label">Nome Completo *</label>
+                                            <input type="text" class="form-control" id="locatario_nome" name="locatario_nome" required
+                                                   placeholder="Digite seu nome completo">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="locatario_tipo" class="form-label">Tipo de Locatário *</label>
+                                            <select class="form-select" id="locatario_tipo" name="locatario_tipo" required>
+                                                <option value="">Selecione...</option>
+                                                <option value="PF">Pessoa Física</option>
+                                                <option value="PJ">Pessoa Jurídica</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="locatario_documento" class="form-label">CPF/CNPJ *</label>
+                                            <input type="text" class="form-control" id="locatario_documento" name="locatario_documento" required
+                                                   placeholder="000.000.000-00">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="locatario_email" class="form-label">E-mail *</label>
+                                            <input type="email" class="form-control" id="locatario_email" name="locatario_email" required
+                                                   placeholder="seu@email.com">
+                                            <small class="text-muted">Usaremos para enviar atualizações sobre seu contrato</small>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="locatario_telefone" class="form-label">Telefone *</label>
+                                            <input type="tel" class="form-control" id="locatario_telefone" name="locatario_telefone" required
+                                                   placeholder="(00) 00000-0000">
+                                            <small class="text-muted">Com DDD</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dados do Imóvel -->
+                                <div class="mb-4">
+                                    <h5 class="section-title">
+                                        <i class="bi bi-house-fill"></i> Dados do Imóvel
+                                    </h5>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="imovel_endereco" class="form-label">Endereço Completo do Imóvel *</label>
+                                            <input type="text" class="form-control" id="imovel_endereco" name="imovel_endereco" required
+                                                   placeholder="Rua, número, complemento, bairro, cidade - UF">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="imovel_codigo" class="form-label">Código do Imóvel (se souber)</label>
+                                            <input type="text" class="form-control" id="imovel_codigo" name="imovel_codigo"
+                                                   placeholder="Ex: APT-101">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dados do Contrato -->
+                                <div class="mb-4">
+                                    <h5 class="section-title">
+                                        <i class="bi bi-file-text-fill"></i> Dados do Contrato
+                                    </h5>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="inicio_vigencia" class="form-label">Início da Vigência *</label>
+                                            <input type="date" class="form-control" id="inicio_vigencia" name="inicio_vigencia" required>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="fim_vigencia" class="form-label">Fim da Vigência *</label>
+                                            <input type="date" class="form-control" id="fim_vigencia" name="fim_vigencia" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="valor_aluguel" class="form-label">Valor do Aluguel (R$) *</label>
+                                            <input type="text" class="form-control" id="valor_aluguel" name="valor_aluguel" required
+                                                   placeholder="1500.00" pattern="[0-9]+(\.[0-9]{1,2})?"
+                                                   title="Use ponto para decimais (ex: 1500.00)">
+                                            <small class="text-muted">Use ponto para decimais (ex: 1500.00)</small>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="tipo_garantia" class="form-label">Tipo de Garantia</label>
+                                            <select class="form-select" id="tipo_garantia" name="tipo_garantia">
+                                                <option value="NENHUMA">Nenhuma</option>
+                                                <option value="CAUCAO">Caução</option>
+                                                <option value="FIADOR">Fiador</option>
+                                                <option value="SEGURO">Seguro Fiança</option>
+                                                <option value="TITULO">Título de Capitalização</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Anexos (Documentos) -->
+                                <div class="mb-4">
+                                    <h5 class="section-title">
+                                        <i class="bi bi-paperclip"></i> Documentos (Opcional)
+                                    </h5>
+                                    
+                                    <div class="alert alert-info" role="alert">
+                                        <i class="bi bi-info-circle"></i>
+                                        <strong>Documentos que você pode enviar agora:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>RG, CPF ou CNH</li>
+                                            <li>Comprovante de Residência</li>
+                                            <li>Comprovante de Renda</li>
+                                            <li>Outros documentos relevantes</li>
+                                        </ul>
+                                        <small class="text-muted">Você também poderá enviar documentos posteriormente.</small>
+                                    </div>
+                                    
+                                    <div id="anexos-container">
+                                        <div class="anexo-item mb-3">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Tipo de Documento</label>
+                                                    <select class="form-select" name="tipo_anexo[]">
+                                                        <option value="">Selecione o tipo...</option>
+                                                        <option value="Cópia dos Documentos Pessoas: RG/CPF e/ou CNH">Cópia dos Documentos Pessoas: RG/CPF e/ou CNH</option>
+                                                        <option value="Comprovante de Residência">Comprovante de Residência</option>
+                                                        <option value="Certidão de Casamento e/ou Atestado de Óbito do Cônjuge">Certidão de Casamento e/ou Atestado de Óbito do Cônjuge</option>
+                                                        <option value="Última Declaração do Imposto de Renda">Última Declaração do Imposto de Renda</option>
+                                                        <option value="Verificação de Processos Judiciais">Verificação de Processos Judiciais</option>
+                                                        <option value="Busca Geral de Protestos">Busca Geral de Protestos</option>
+                                                        <option value="Consulta de Restrições de Crédito (SPC/SERASA)">Consulta de Restrições de Crédito (SPC/SERASA)</option>
+                                                        <option value="Laudo de Vistoria">Laudo de Vistoria</option>
+                                                        <option value="Contrato Assinado">Contrato Assinado</option>
+                                                        <option value="Contrato Social">Contrato Social (PJ)</option>
+                                                        <option value="Cartão CNPJ">Cartão CNPJ (PJ)</option>
+                                                        <option value="Inscrição Estadual e Municipal">Inscrição Estadual e Municipal (PJ)</option>
+                                                        <option value="Declaração do Imposto de Renda da Empresa">Declaração do Imposto de Renda da Empresa (PJ)</option>
+                                                        <option value="RG e CPF do Sócio - Administrador">RG e CPF do Sócio - Administrador (PJ)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Arquivo</label>
+                                                    <input type="file" class="form-control" name="anexos[]" 
+                                                           accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                                    <small class="text-muted">PDF, JPG, PNG, DOC (máx. 10MB)</small>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Observação</label>
+                                                    <input type="text" class="form-control" name="observacao_anexo[]" placeholder="Opcional">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="btn-adicionar-anexo">
+                                        <i class="bi bi-plus-circle"></i> Adicionar Outro Documento
+                                    </button>
+                                </div>
+                                
+                                <!-- Observações Gerais -->
+                                <div class="mb-4">
+                                    <h5 class="section-title">
+                                        <i class="bi bi-chat-left-text"></i> Observações Gerais
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <label for="observacoes_gerais" class="form-label">Observações</label>
+                                        <textarea class="form-control" id="observacoes_gerais" name="observacoes_gerais" rows="4" 
+                                                  placeholder="Digite aqui observações gerais sobre o contrato, informações adicionais, pendências, etc."></textarea>
+                                        <small class="text-muted">Campo opcional para anotações e informações complementares</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Termos e Condições -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="aceite_termos" required>
+                                        <label class="form-check-label" for="aceite_termos">
+                                            Declaro que as informações fornecidas são verdadeiras e estou ciente de que serão utilizadas para análise e elaboração do contrato de locação. *
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botões -->
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-check-circle"></i> Enviar Cadastro
+                                    </button>
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield-check"></i> Seus dados estão protegidos e serão usados apenas para o processo de locação
+                                    </small>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            <small>© 2025 T2 Web Real Estate. Todos os direitos reservados.</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Documentos por tipo de locatário (baseado nas imagens fornecidas)
+        const documentosPF = [
+            'Cópia dos Documentos Pessoas: RG/CPF e/ou CNH',
+            'Comprovante de Residência',
+            'Certidão de Casamento e/ou Atestado de Óbito do Cônjuge',
+            'Última Declaração do Imposto de Renda',
+            'Outros'
+        ];
+        
+        const documentosPJ = [
+            'Contrato Social',
+            'Cartão CNPJ',
+            'Inscrição Estadual e Municipal',
+            'Comprovante de Endereço',
+            'Declaração do Imposto de Renda da Empresa',
+            'RG e CPF do Sócio - Administrador',
+            'Outros'
+        ];
+        
+        // Função para atualizar opções de documentos
+        function atualizarOpcoesDocumentos() {
+            const tipoLocatario = document.getElementById('locatario_tipo').value;
+            const documentos = tipoLocatario === 'PJ' ? documentosPJ : documentosPF;
+            
+            // Atualizar todos os selects de tipo de documento
+            const selects = document.querySelectorAll('select[name="tipo_anexo[]"]');
+            selects.forEach(select => {
+                const valorAtual = select.value;
+                select.innerHTML = '<option value="">Selecione o tipo...</option>';
+                documentos.forEach(doc => {
+                    const option = document.createElement('option');
+                    option.value = doc;
+                    option.textContent = doc;
+                    if (doc === valorAtual) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            });
+        }
+        
+        // Atualizar documentos quando mudar o tipo de locatário
+        document.getElementById('locatario_tipo').addEventListener('change', atualizarOpcoesDocumentos);
+        
+        // Atualizar ao carregar a página
+        document.addEventListener('DOMContentLoaded', atualizarOpcoesDocumentos);
+        
+        // Definir data mínima para fim da vigência baseado no início
+        document.getElementById('inicio_vigencia').addEventListener('change', function() {
+            const inicioVigencia = this.value;
+            document.getElementById('fim_vigencia').min = inicioVigencia;
+        });
+        
+        // Validação adicional antes de enviar
+        document.getElementById('formCadastroPublico').addEventListener('submit', function(e) {
+            const inicio = new Date(document.getElementById('inicio_vigencia').value);
+            const fim = new Date(document.getElementById('fim_vigencia').value);
+            
+            if (fim <= inicio) {
+                e.preventDefault();
+                alert('A data de fim da vigência deve ser posterior à data de início.');
+                return false;
+            }
+        });
+        
+        // Função para criar HTML de novo anexo
+        function criarNovoAnexoHTML() {
+            const tipoLocatario = document.getElementById('locatario_tipo').value;
+            const documentos = tipoLocatario === 'PJ' ? documentosPJ : documentosPF;
+            
+            let optionsHTML = '<option value="">Selecione o tipo...</option>';
+            documentos.forEach(doc => {
+                optionsHTML += `<option value="${doc}">${doc}</option>`;
+            });
+            
+            return `
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Tipo de Documento</label>
+                        <select class="form-select" name="tipo_anexo[]">
+                            ${optionsHTML}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Arquivo</label>
+                        <input type="file" class="form-control" name="anexos[]" 
+                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        <small class="text-muted">PDF, JPG, PNG, DOC (máx. 10MB)</small>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Observação</label>
+                        <input type="text" class="form-control" name="observacao_anexo[]" placeholder="Opcional">
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger btn-sm btn-remover-anexo mb-3">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Adicionar mais campos de anexo dinamicamente
+        document.getElementById('btn-adicionar-anexo').addEventListener('click', function() {
+            const container = document.getElementById('anexos-container');
+            const novoAnexo = document.createElement('div');
+            novoAnexo.className = 'anexo-item mb-3';
+            novoAnexo.innerHTML = criarNovoAnexoHTML();
+            container.appendChild(novoAnexo);
+            
+            // Adicionar evento de remover ao novo botão
+            novoAnexo.querySelector('.btn-remover-anexo').addEventListener('click', function() {
+                novoAnexo.remove();
+            });
+        });
+        
+        // Adicionar evento de remover aos botões existentes
+        document.querySelectorAll('.btn-remover-anexo').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.anexo-item').remove();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+
+{% block title %}Kanban - Contratos{% endblock %}
+
+{% block content %}
+<div class="mt-3">
+    <!-- Seção de Filtros -->
+    <div class="filter-section">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="q" class="form-label">
+                    <i class="bi bi-search"></i> Buscar
+                </label>
+                <input type="text" class="form-control" id="q" name="q" 
+                       placeholder="Nome, locatário, imóvel..." value="{{ filtro_texto }}">
+            </div>
+            
+            <div class="col-md-3">
+                <label for="responsavel" class="form-label">
+                    <i class="bi bi-person"></i> Responsável
+                </label>
+                <select class="form-select" id="responsavel" name="responsavel">
+                    <option value="">Todos</option>
+                    {% for resp in responsaveis %}
+                    <option value="{{ resp.id }}" {% if filtro_responsavel == resp.id|stringformat:"s" %}selected{% endif %}>
+                        {{ resp.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label for="tipo_locatario" class="form-label">
+                    <i class="bi bi-building"></i> Tipo de Locatário
+                </label>
+                <select class="form-select" id="tipo_locatario" name="tipo_locatario">
+                    <option value="">Todos</option>
+                    <option value="PF" {% if filtro_tipo_locatario == "PF" %}selected{% endif %}>Pessoa Física</option>
+                    <option value="PJ" {% if filtro_tipo_locatario == "PJ" %}selected{% endif %}>Pessoa Jurídica</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+                <a href="{% url 'contratos:criar' %}" class="btn btn-success flex-fill" title="Novo Contrato">
+                    <i class="bi bi-plus-circle"></i> Novo
+                </a>
+            </div>
+        </form>
+        
+        <div class="mt-2">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i> 
+                Total de contratos: <strong>{{ total_contratos }}</strong>
+            </small>
+        </div>
+    </div>
+    
+    <!-- Board Kanban -->
+    <div class="kanban-container">
+        <div class="kanban-board">
+            {% for status_code, coluna in colunas.items %}
+            <div class="kanban-column">
+                <div class="kanban-column-header" style="border-color: {{ coluna.cor }}; background-color: {{ coluna.cor }}15;">
+                    <span style="color: {{ coluna.cor }};">{{ coluna.titulo }}</span>
+                    <span class="column-counter" style="background-color: {{ coluna.cor }}30; color: {{ coluna.cor }};">
+                        {{ coluna.contador }}
+                    </span>
+                </div>
+                
+                <div class="kanban-column-body" id="column-{{ status_code }}" data-status="{{ status_code }}">
+                    {% for contrato in coluna.contratos %}
+                    <div class="kanban-card" data-id="{{ contrato.id }}">
+                        <div class="card-title">
+                            {{ contrato.nome_negociacao }}
+                        </div>
+                        
+                        <div class="card-info">
+                            <i class="bi bi-person"></i> {{ contrato.locatario_nome }}
+                            {% if contrato.locatario_tipo == 'PJ' %}
+                            <span class="badge bg-info">PJ</span>
+                            {% else %}
+                            <span class="badge bg-secondary">PF</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-info">
+                            <i class="bi bi-house"></i> {{ contrato.imovel_endereco|truncatechars:30 }}
+                        </div>
+                        
+                        {% if contrato.fim_vigencia %}
+                        <div class="card-info">
+                            <i class="bi bi-calendar-event"></i> 
+                            Vence: {{ contrato.fim_vigencia|date:"d/m/Y" }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if contrato.responsavel %}
+                        <div class="card-info">
+                            <i class="bi bi-person-badge"></i> {{ contrato.responsavel.username }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-badges">
+                            <!-- Badge de garantia -->
+                            {% if contrato.tipo_garantia != 'NENHUMA' %}
+                            <span class="badge bg-primary">
+                                <i class="bi bi-shield-check"></i> {{ contrato.get_tipo_garantia_display }}
+                            </span>
+                            {% endif %}
+                            
+                            <!-- Badge de vencimento -->
+                            {% if contrato.dias_para_vencimento != None %}
+                            <span class="badge bg-{{ contrato.cor_vencimento }}">
+                                <i class="bi bi-clock"></i>
+                                {% if contrato.dias_para_vencimento < 0 %}
+                                    Vencido há {{ contrato.dias_para_vencimento|make_list|slice:"1:"|join:"" }} dias
+                                {% elif contrato.dias_para_vencimento == 0 %}
+                                    Vence hoje
+                                {% else %}
+                                    {{ contrato.dias_para_vencimento }} dias
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                            
+                            <!-- Badge de SLA -->
+                            {% if contrato.sla_excedido %}
+                            <span class="badge bg-danger sla-badge">
+                                <i class="bi bi-exclamation-triangle"></i> +{{ contrato.sla_excedido }}d
+                            </span>
+                            {% endif %}
+                            
+                            <!-- Badge de anexos -->
+                            {% if contrato.possui_anexos %}
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-paperclip"></i>
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Botões de ação -->
+                        <div class="mt-2 d-flex gap-1">
+                            <a href="{% url 'contratos:detalhe' contrato.id %}" 
+                               class="btn btn-sm btn-outline-primary flex-fill" 
+                               onclick="event.stopPropagation();">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                            {% if contrato.responsavel == user or user.is_staff %}
+                            <a href="{% url 'contratos:editar' contrato.id %}" 
+                               class="btn btn-sm btn-outline-warning flex-fill" 
+                               onclick="event.stopPropagation();">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-inbox"></i><br>
+                        <small>Nenhum contrato</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para motivo de cancelamento -->
+<div class="modal fade" id="motivoCancelamentoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Motivo do Cancelamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="motivo_cancelamento" class="form-label">
+                        Por favor, informe o motivo do cancelamento:
+                    </label>
+                    <textarea class="form-control" id="motivo_cancelamento" rows="4" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarCancelamento">
+                    Confirmar Cancelamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmação de saída sem anexo -->
+<div class="modal fade" id="confirmacaoAnexoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Atenção
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-3">
+                    <strong id="mensagemConfirmacao"></strong>
+                </div>
+                <div class="mb-3">
+                    <label for="palavraConfirmacao" class="form-label" id="promptConfirmacao"></label>
+                    <input type="text" class="form-control form-control-lg text-center" 
+                           id="palavraConfirmacao" 
+                           placeholder="Digite aqui"
+                           autocomplete="off">
+                    <small class="text-muted">Digite exatamente a palavra solicitada (maiúsculas e minúsculas importam)</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Voltar
+                </button>
+                <button type="button" class="btn btn-warning" id="confirmarSemAnexo">
+                    <i class="bi bi-check-circle"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Obter CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    
+    // Variáveis para controle do cancelamento
+    let pendingCancelData = null;
+    const motivoModal = new bootstrap.Modal(document.getElementById('motivoCancelamentoModal'));
+    
+    // Função para mudar status via AJAX
+    function mudarStatus(contratoId, novoStatus, motivoCancelamento = '', confirmacao = '') {
+        const formData = new FormData();
+        formData.append('status', novoStatus);
+        if (motivoCancelamento) {
+            formData.append('motivo_cancelamento', motivoCancelamento);
+        }
+        if (confirmacao) {
+            formData.append('confirmacao', confirmacao);
+        }
+        
+        fetch(`/kanban/${contratoId}/mudar-status/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensagem de sucesso
+                showAlert('success', data.message);
+                // Recarregar após 1 segundo
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                // Se requer motivo de cancelamento
+                if (data.require_reason) {
+                    // Armazenar dados e mostrar modal
+                    pendingCancelData = { contratoId, novoStatus };
+                    motivoModal.show();
+                }
+                // Se requer confirmação (saída sem anexo)
+                else if (data.require_confirmation) {
+                    mostrarModalConfirmacao(contratoId, novoStatus, data.error, data.confirmation_message, data.confirmation_word);
+                }
+                else {
+                    showAlert('danger', data.error);
+                    // Recarregar página em caso de erro
+                    setTimeout(() => location.reload(), 1500);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showAlert('danger', 'Erro ao atualizar status');
+            setTimeout(() => location.reload(), 1500);
+        });
+    }
+    
+    // Função para mostrar modal de confirmação
+    function mostrarModalConfirmacao(contratoId, novoStatus, mensagem, promptTexto, palavraConfirmacao) {
+        const modalConfirmacao = new bootstrap.Modal(document.getElementById('confirmacaoAnexoModal'));
+        document.getElementById('mensagemConfirmacao').textContent = mensagem;
+        document.getElementById('promptConfirmacao').textContent = promptTexto;
+        document.getElementById('palavraConfirmacao').value = '';
+        
+        // Remover listeners antigos
+        const btnConfirmar = document.getElementById('confirmarSemAnexo');
+        const novoBtn = btnConfirmar.cloneNode(true);
+        btnConfirmar.parentNode.replaceChild(novoBtn, btnConfirmar);
+        
+        // Adicionar novo listener para confirmar
+        novoBtn.addEventListener('click', function() {
+            const palavraDigitada = document.getElementById('palavraConfirmacao').value.trim();
+            
+            if (palavraDigitada !== palavraConfirmacao) {
+                showAlert('danger', `Digite exatamente "${palavraConfirmacao}" para confirmar`);
+                return;
+            }
+            
+            // Fechar modal e enviar com confirmação
+            modalConfirmacao.hide();
+            movimentoPendente = null; // Limpar movimento pendente
+            mudarStatus(contratoId, novoStatus, '', palavraConfirmacao);
+        });
+        
+        // Listener para quando fechar modal sem confirmar
+        const modalElement = document.getElementById('confirmacaoAnexoModal');
+        modalElement.addEventListener('hidden.bs.modal', function handler() {
+            // Se ainda tem movimento pendente, reverter
+            if (movimentoPendente) {
+                // Reverter movimento visual
+                movimentoPendente.from.insertBefore(movimentoPendente.item, movimentoPendente.from.children[movimentoPendente.oldIndex]);
+                movimentoPendente = null;
+            }
+            // Remover este listener para não acumular
+            modalElement.removeEventListener('hidden.bs.modal', handler);
+        }, { once: true });
+        
+        modalConfirmacao.show();
+    }
+    
+    // Função para mostrar alertas
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+    
+    // Variável para controlar movimento pendente
+    let movimentoPendente = null;
+    
+    // Configurar Sortable para cada coluna
+    const colunas = document.querySelectorAll('.kanban-column-body');
+    colunas.forEach(coluna => {
+        new Sortable(coluna, {
+            group: 'kanban',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            onEnd: function(evt) {
+                const contratoId = evt.item.dataset.id;
+                const novoStatus = evt.to.dataset.status;
+                const statusAnterior = evt.from.dataset.status;
+                
+                // Se não mudou de coluna, não fazer nada
+                if (novoStatus === statusAnterior) {
+                    return;
+                }
+                
+                // Armazenar informações do movimento
+                movimentoPendente = {
+                    item: evt.item,
+                    from: evt.from,
+                    to: evt.to,
+                    oldIndex: evt.oldIndex
+                };
+                
+                // Mudar status
+                mudarStatus(contratoId, novoStatus);
+            }
+        });
+    });
+    
+    // Handler para confirmar cancelamento com motivo
+    document.getElementById('confirmarCancelamento').addEventListener('click', function() {
+        const motivo = document.getElementById('motivo_cancelamento').value.trim();
+        
+        if (!motivo) {
+            alert('Por favor, informe o motivo do cancelamento.');
+            return;
+        }
+        
+        if (pendingCancelData) {
+            mudarStatus(pendingCancelData.contratoId, pendingCancelData.novoStatus, motivo);
+            motivoModal.hide();
+            pendingCancelData = null;
+            document.getElementById('motivo_cancelamento').value = '';
+        }
+    });
+    
+    // Limpar modal ao fechar
+    document.getElementById('motivoCancelamentoModal').addEventListener('hidden.bs.modal', function() {
+        if (pendingCancelData) {
+            // Recarregar página se cancelou o modal
+            location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}
